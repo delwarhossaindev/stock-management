@@ -12,9 +12,11 @@
             <div class="card-body">
                 <table class="table table-borderless">
                     <tr><th width="150">{{ __('SKU') }}:</th><td><code>{{ $product->sku }}</code></td></tr>
+                    <tr><th>{{ __('Barcode') }}:</th><td>{{ $product->barcode ?? __('N/A') }}</td></tr>
                     <tr><th>{{ __('Category') }}:</th><td>{{ $product->category->name }}</td></tr>
                     <tr><th>{{ __('Buy Price') }}:</th><td>৳{{ number_format($product->buy_price, 2) }}</td></tr>
                     <tr><th>{{ __('Sell Price') }}:</th><td>৳{{ number_format($product->sell_price, 2) }}</td></tr>
+                    <tr><th>{{ __('Tax Rate') }}:</th><td>{{ $product->tax_rate }}%</td></tr>
                     <tr><th>{{ __('Stock') }}:</th><td><span class="badge {{ $product->quantity <= 5 ? 'bg-danger' : 'bg-success' }}">{{ $product->quantity }} {{ $product->unit->name ?? '' }}</span></td></tr>
                     <tr><th>{{ __('Description') }}:</th><td>{{ $product->description ?? __('N/A') }}</td></tr>
                 </table>

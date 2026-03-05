@@ -42,7 +42,13 @@
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-cart-plus"></i> {{ __('Products') }}</span>
-                    <button type="button" class="btn btn-sm btn-success" id="addRow"><i class="bi bi-plus-circle"></i> {{ __('Add Product') }}</button>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group input-group-sm" style="width: 250px;">
+                            <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                            <input type="text" id="barcodeInput" class="form-control" placeholder="{{ __('Scan Barcode') }}" autocomplete="off">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" id="addRow"><i class="bi bi-plus-circle"></i> {{ __('Add Product') }}</button>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -64,7 +70,7 @@
                                         <select name="items[{{ $i }}][product_id]" class="form-select product-select" required>
                                             <option value="">{{ __('Select Product') }}</option>
                                             @foreach($products as $product)
-                                                <option value="{{ $product->id }}" data-price="{{ $product->sell_price }}" data-stock="{{ $product->quantity }}" {{ $item->product_id == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
+                                                <option value="{{ $product->id }}" data-price="{{ $product->sell_price }}" data-stock="{{ $product->quantity }}" data-barcode="{{ $product->barcode }}" {{ $item->product_id == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -108,6 +114,20 @@
                             <span class="input-group-text">৳</span>
                             <input type="number" step="0.01" name="discount" id="discountInput" class="form-control" value="{{ old('discount', $sale->discount) }}" min="0">
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Tax') }}</label>
+                        <div class="input-group">
+                            <select name="tax_type" id="taxTypeInput" class="form-select" style="max-width: 90px;">
+                                <option value="percentage" {{ old('tax_type', $sale->tax_type) == 'percentage' ? 'selected' : '' }}>%</option>
+                                <option value="fixed" {{ old('tax_type', $sale->tax_type) == 'fixed' ? 'selected' : '' }}>৳</option>
+                            </select>
+                            <input type="number" step="0.01" name="tax_value" id="taxValueInput" class="form-control" value="{{ old('tax_value', $sale->tax_value) }}" min="0">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>{{ __('Tax Amount') }}</span>
+                        <span class="fw-bold" id="taxAmountDisplay">৳{{ number_format($sale->tax_amount, 2) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
@@ -165,6 +185,30 @@
 <script>
 $(function() {
     let rowIndex = {{ count($sale->items) }};
+
+    // Barcode scanner
+    $('#barcodeInput').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            const barcode = $(this).val().trim();
+            if (!barcode) return;
+            const lastRow = $('.item-row:last');
+            const select = lastRow.find('.product-select');
+            const option = select.find('option[data-barcode="' + barcode + '"]');
+            if (option.length) {
+                if (select.val()) {
+                    $('#addRow').trigger('click');
+                    const newRow = $('.item-row:last');
+                    newRow.find('.product-select').val(option.val()).trigger('change');
+                } else {
+                    select.val(option.val()).trigger('change');
+                }
+            } else {
+                alert('{{ __("Product not found for this barcode.") }}');
+            }
+            $(this).val('').focus();
+        }
+    });
 
     // Customer select → fill hidden name
     $('#customerSelect').on('change', function() {
@@ -226,7 +270,7 @@ $(function() {
         calculateRow($(this).closest('tr'));
     });
 
-    $('#discountInput, #paidInput').on('input', calculateTotals);
+    $('#discountInput, #paidInput, #taxValueInput, #taxTypeInput').on('input change', calculateTotals);
 
     function calculateRow(row) {
         const qty = parseFloat(row.find('.qty-input').val()) || 0;
@@ -245,11 +289,16 @@ $(function() {
         });
 
         const discount = parseFloat($('#discountInput').val()) || 0;
-        const netTotal = subtotal - discount;
+        const afterDiscount = subtotal - discount;
+        const taxType = $('#taxTypeInput').val();
+        const taxValue = parseFloat($('#taxValueInput').val()) || 0;
+        const taxAmount = taxType === 'percentage' ? (afterDiscount * taxValue / 100) : taxValue;
+        const netTotal = afterDiscount + taxAmount;
         const paid = parseFloat($('#paidInput').val()) || 0;
         const due = netTotal - paid;
 
         $('#subtotalDisplay').text('৳' + subtotal.toFixed(2));
+        $('#taxAmountDisplay').text('৳' + taxAmount.toFixed(2));
         $('#netTotalDisplay').text('৳' + netTotal.toFixed(2));
         $('#dueDisplay').text('৳' + due.toFixed(2));
         $('#dueDisplay').toggleClass('text-danger', due > 0).toggleClass('text-success', due <= 0);

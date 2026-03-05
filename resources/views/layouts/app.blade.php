@@ -596,6 +596,11 @@
                     <i class="bi bi-cart-check"></i> {{ __('Sales') }}
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('quotations.*') ? 'active' : '' }}" href="{{ route('quotations.index') }}">
+                    <i class="bi bi-file-earmark-text"></i> {{ __('Quotations') }}
+                </a>
+            </li>
 
             <div class="sidebar-section">{{ __('Reports') }}</div>
             <li class="nav-item">

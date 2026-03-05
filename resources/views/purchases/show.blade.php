@@ -63,6 +63,12 @@
                         <td>{{ __('Discount') }}</td>
                         <td class="text-end">৳{{ number_format($purchase->discount, 2) }}</td>
                     </tr>
+                    @if($purchase->tax_value > 0)
+                    <tr>
+                        <td>{{ __('Tax') }} ({{ $purchase->tax_type === 'percentage' ? $purchase->tax_value . '%' : '৳' . number_format($purchase->tax_value, 2) }})</td>
+                        <td class="text-end">৳{{ number_format($purchase->tax_amount, 2) }}</td>
+                    </tr>
+                    @endif
                     <tr class="table-primary">
                         <td class="fw-bold fs-5">{{ __('Net Total') }}</td>
                         <td class="text-end fw-bold fs-5">৳{{ number_format($purchase->total_price, 2) }}</td>

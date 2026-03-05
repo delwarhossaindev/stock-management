@@ -14,9 +14,13 @@
                     <label class="form-label">{{ __('Name') }} <span class="text-danger">*</span></label>
                     <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-3 mb-3">
                     <label class="form-label">{{ __('SKU') }} <span class="text-danger">*</span></label>
                     <input type="text" name="sku" class="form-control" value="{{ old('sku') }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">{{ __('Barcode') }}</label>
+                    <input type="text" name="barcode" class="form-control" value="{{ old('barcode') }}" placeholder="{{ __('Optional') }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">{{ __('Category') }} <span class="text-danger">*</span></label>
@@ -50,7 +54,11 @@
                         <input type="number" step="0.01" name="sell_price" class="form-control" value="{{ old('sell_price', 0) }}" required>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">{{ __('Tax Rate') }} (%)</label>
+                    <input type="number" step="0.01" name="tax_rate" class="form-control" value="{{ old('tax_rate', 0) }}" min="0" max="100">
+                </div>
+                <div class="col-md-2 mb-3">
                     <label class="form-label">{{ __('Quantity') }} <span class="text-danger">*</span></label>
                     <input type="number" name="quantity" class="form-control" value="{{ old('quantity', 0) }}" required>
                 </div>

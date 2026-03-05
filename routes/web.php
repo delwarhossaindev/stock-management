@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
@@ -29,6 +30,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class)->only(['index', 'show']);
     Route::resource('purchases', PurchaseController::class)->only(['index', 'show', 'create', 'store']);
     Route::resource('sales', SaleController::class)->only(['index', 'show', 'create', 'store']);
+    Route::resource('quotations', QuotationController::class)->only(['index', 'show', 'create', 'store']);
+    Route::get('quotations/{quotation}/pdf', [QuotationController::class, 'downloadPdf'])->name('quotations.pdf');
+    Route::post('quotations/{quotation}/email', [QuotationController::class, 'sendEmail'])->name('quotations.email');
 
     // --- Quick store (both roles – needed when creating purchases/sales) ---
     Route::post('suppliers-quick', [SupplierController::class, 'quickStore'])->name('suppliers.quick');
@@ -78,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         // --- Purchase & Sale edit/delete (admin only) ---
         Route::resource('purchases', PurchaseController::class)->only(['edit', 'update', 'destroy']);
         Route::resource('sales', SaleController::class)->only(['edit', 'update', 'destroy']);
+        Route::resource('quotations', QuotationController::class)->only(['edit', 'update', 'destroy']);
 
         // --- Import & Sample download (admin only) ---
         Route::post('categories-import', [CategoryController::class, 'import'])->name('categories.import');

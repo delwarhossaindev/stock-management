@@ -18,8 +18,17 @@ class ProductController extends Controller
     {
         if ($request->ajax()) {
             $products = Product::with('category', 'unit')->latest();
+            if ($request->filled('category_id')) {
+                $products->where('category_id', $request->category_id);
+            }
+            if ($request->filled('unit_id')) {
+                $products->where('unit_id', $request->unit_id);
+            }
             return DataTables::of($products)
                 ->addIndexColumn()
+                ->editColumn('barcode', function ($row) {
+                    return $row->barcode ?? '-';
+                })
                 ->addColumn('category_name', function ($row) {
                     return $row->category->name ?? '-';
                 })
@@ -67,15 +76,18 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'sku' => 'required|string|unique:products,sku',
+            'barcode' => 'nullable|string|max:255|unique:products,barcode',
             'description' => 'nullable|string',
             'buy_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'quantity' => 'required|integer|min:0',
             'unit_id' => 'required|exists:units,id',
             'image' => 'nullable|image|max:2048',
         ]);
 
         $data = $request->except('image');
+        $data['tax_rate'] = $request->tax_rate ?? 0;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
@@ -104,15 +116,18 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'sku' => 'required|string|unique:products,sku,' . $product->id,
+            'barcode' => 'nullable|string|max:255|unique:products,barcode,' . $product->id,
             'description' => 'nullable|string',
             'buy_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'quantity' => 'required|integer|min:0',
             'unit_id' => 'required|exists:units,id',
             'image' => 'nullable|image|max:2048',
         ]);
 
         $data = $request->except('image');
+        $data['tax_rate'] = $request->tax_rate ?? 0;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');

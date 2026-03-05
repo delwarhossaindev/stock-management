@@ -75,7 +75,7 @@
                     <td>৳{{ number_format($product->sell_price, 2) }}</td>
                     <td>
                         <span class="badge {{ $product->quantity <= 5 ? ($product->quantity == 0 ? 'bg-danger' : 'bg-warning text-dark') : 'bg-success' }}">
-                            {{ $product->quantity }} {{ $product->unit }}
+                            {{ $product->quantity }} {{ $product->unit->name ?? '' }}
                         </span>
                     </td>
                     <td>৳{{ number_format($product->quantity * $product->buy_price, 2) }}</td>

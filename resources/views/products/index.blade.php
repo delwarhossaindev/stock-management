@@ -15,7 +15,7 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0" id="dataTable">
             <thead class="table-light">
-                <tr><th>#</th><th>{{ __('Name') }}</th><th>{{ __('SKU') }}</th><th>{{ __('Category') }}</th><th>{{ __('Buy Price') }}</th><th>{{ __('Sell Price') }}</th><th>{{ __('Stock') }}</th><th>{{ __('Action') }}</th></tr>
+                <tr><th>#</th><th>{{ __('Name') }}</th><th>{{ __('SKU') }}</th><th>{{ __('Barcode') }}</th><th>{{ __('Category') }}</th><th>{{ __('Buy Price') }}</th><th>{{ __('Sell Price') }}</th><th>{{ __('Stock') }}</th><th>{{ __('Action') }}</th></tr>
             </thead>
         </table>
     </div>
@@ -59,11 +59,12 @@ $(function() {
     $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('products.index') }}",
+        ajax: "{{ route('products.index', ['category_id' => request('category_id'), 'unit_id' => request('unit_id')]) }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'name', name: 'name'},
             {data: 'sku', name: 'sku'},
+            {data: 'barcode', name: 'barcode'},
             {data: 'category_name', name: 'category.name'},
             {data: 'buy_price_fmt', name: 'buy_price'},
             {data: 'sell_price_fmt', name: 'sell_price'},

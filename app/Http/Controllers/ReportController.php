@@ -16,7 +16,7 @@ class ReportController extends Controller
 
     public function stock(Request $request)
     {
-        $query = Product::with('category');
+        $query = Product::with('category', 'unit');
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);

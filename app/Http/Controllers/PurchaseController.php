@@ -65,6 +65,8 @@ class PurchaseController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_date' => 'required|date',
             'discount' => 'nullable|numeric|min:0',
+            'tax_type' => 'nullable|in:percentage,fixed',
+            'tax_value' => 'nullable|numeric|min:0',
             'paid_amount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
             'items' => 'required|array|min:1',
@@ -89,7 +91,11 @@ class PurchaseController extends Controller
             }
 
             $discount = $request->discount ?? 0;
-            $totalPrice = $subtotal - $discount;
+            $afterDiscount = $subtotal - $discount;
+            $taxType = $request->tax_type ?? 'percentage';
+            $taxValue = $request->tax_value ?? 0;
+            $taxAmount = $taxType === 'percentage' ? ($afterDiscount * $taxValue / 100) : $taxValue;
+            $totalPrice = $afterDiscount + $taxAmount;
             $paidAmount = $request->paid_amount ?? 0;
             $dueAmount = $totalPrice - $paidAmount;
 
@@ -98,6 +104,9 @@ class PurchaseController extends Controller
                 'supplier_id' => $request->supplier_id,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'tax_type' => $taxType,
+                'tax_value' => $taxValue,
+                'tax_amount' => $taxAmount,
                 'total_price' => $totalPrice,
                 'paid_amount' => $paidAmount,
                 'due_amount' => $dueAmount,
@@ -136,6 +145,8 @@ class PurchaseController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_date' => 'required|date',
             'discount' => 'nullable|numeric|min:0',
+            'tax_type' => 'nullable|in:percentage,fixed',
+            'tax_value' => 'nullable|numeric|min:0',
             'paid_amount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
             'items' => 'required|array|min:1',
@@ -166,7 +177,11 @@ class PurchaseController extends Controller
             }
 
             $discount = $request->discount ?? 0;
-            $totalPrice = $subtotal - $discount;
+            $afterDiscount = $subtotal - $discount;
+            $taxType = $request->tax_type ?? 'percentage';
+            $taxValue = $request->tax_value ?? 0;
+            $taxAmount = $taxType === 'percentage' ? ($afterDiscount * $taxValue / 100) : $taxValue;
+            $totalPrice = $afterDiscount + $taxAmount;
             $paidAmount = $request->paid_amount ?? 0;
             $dueAmount = $totalPrice - $paidAmount;
 
@@ -174,6 +189,9 @@ class PurchaseController extends Controller
                 'supplier_id' => $request->supplier_id,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'tax_type' => $taxType,
+                'tax_value' => $taxValue,
+                'tax_amount' => $taxAmount,
                 'total_price' => $totalPrice,
                 'paid_amount' => $paidAmount,
                 'due_amount' => $dueAmount,

@@ -2,63 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\SalesExport;
-use App\Exports\SampleSalesExport;
-use App\Imports\SalesImport;
+use App\Mail\QuotationMail;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\Sale;
-use App\Models\SaleItem;
+use App\Models\Quotation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\Facades\DataTables;
 
-class SaleController extends Controller
+class QuotationController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $sales = Sale::with('customer')->withCount('items')->latest();
-            return DataTables::of($sales)
+            $quotations = Quotation::with('customer')->withCount('items')->latest();
+            return DataTables::of($quotations)
                 ->addIndexColumn()
-                ->addColumn('date_fmt', fn($row) => $row->sale_date->format('d/m/Y'))
-                ->editColumn('invoice_no', fn($row) => '<strong>' . $row->invoice_no . '</strong>')
+                ->addColumn('date_fmt', fn($row) => $row->quotation_date->format('d/m/Y'))
+                ->editColumn('quotation_no', fn($row) => '<strong>' . $row->quotation_no . '</strong>')
                 ->addColumn('customer_display', fn($row) => $row->customer->name ?? ($row->customer_name ?? '-'))
-                ->addColumn('subtotal_fmt', fn($row) => '৳' . number_format($row->subtotal, 2))
-                ->addColumn('discount_fmt', fn($row) => '৳' . number_format($row->discount, 2))
                 ->addColumn('total_price_fmt', fn($row) => '<strong>৳' . number_format($row->total_price, 2) . '</strong>')
-                ->addColumn('paid_fmt', fn($row) => '৳' . number_format($row->paid_amount, 2))
-                ->addColumn('due_fmt', function ($row) {
-                    $color = $row->due_amount > 0 ? 'text-danger' : 'text-success';
-                    return '<span class="' . $color . '">৳' . number_format($row->due_amount, 2) . '</span>';
-                })
                 ->addColumn('action', function ($row) {
-                    $show = route('sales.show', $row);
+                    $show = route('quotations.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
                     if (auth()->user()->isAdmin()) {
-                        $edit = route('sales.edit', $row);
-                        $delete = route('sales.destroy', $row);
+                        $edit = route('quotations.edit', $row);
+                        $delete = route('quotations.destroy', $row);
                         $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                            <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this sale? Stock will be adjusted.') . '\')">
+                            <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                             </form>';
                     }
                     return $btn;
                 })
-                ->rawColumns(['invoice_no', 'total_price_fmt', 'due_fmt', 'action'])
+                ->rawColumns(['quotation_no', 'total_price_fmt', 'action'])
                 ->make(true);
         }
-        return view('sales.index');
+        return view('quotations.index');
     }
 
     public function create()
     {
-        $products = Product::where('quantity', '>', 0)->get();
+        $products = Product::all();
         $customers = Customer::orderBy('name')->get();
-        $invoiceNo = Sale::generateInvoiceNo();
-        return view('sales.create', compact('products', 'customers', 'invoiceNo'));
+        $quotationNo = Quotation::generateQuotationNo();
+        return view('quotations.create', compact('products', 'customers', 'quotationNo'));
     }
 
     public function store(Request $request)
@@ -66,16 +57,15 @@ class SaleController extends Controller
         $request->validate([
             'customer_id' => 'nullable|exists:customers,id',
             'customer_name' => 'nullable|string|max:255',
-            'sale_date' => 'required|date',
+            'quotation_date' => 'required|date',
             'discount' => 'nullable|numeric|min:0',
             'tax_type' => 'nullable|in:percentage,fixed',
             'tax_value' => 'nullable|numeric|min:0',
-            'paid_amount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.sell_price' => 'required|numeric|min:0',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -83,12 +73,12 @@ class SaleController extends Controller
             $itemsData = [];
 
             foreach ($request->items as $item) {
-                $lineTotal = $item['quantity'] * $item['sell_price'];
+                $lineTotal = $item['quantity'] * $item['unit_price'];
                 $subtotal += $lineTotal;
                 $itemsData[] = [
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'sell_price' => $item['sell_price'],
+                    'unit_price' => $item['unit_price'],
                     'total' => $lineTotal,
                 ];
             }
@@ -99,11 +89,9 @@ class SaleController extends Controller
             $taxValue = $request->tax_value ?? 0;
             $taxAmount = $taxType === 'percentage' ? ($afterDiscount * $taxValue / 100) : $taxValue;
             $totalPrice = $afterDiscount + $taxAmount;
-            $paidAmount = $request->paid_amount ?? 0;
-            $dueAmount = $totalPrice - $paidAmount;
 
-            $sale = Sale::create([
-                'invoice_no' => Sale::generateInvoiceNo(),
+            $quotation = Quotation::create([
+                'quotation_no' => Quotation::generateQuotationNo(),
                 'customer_id' => $request->customer_id,
                 'customer_name' => $request->customer_name,
                 'subtotal' => $subtotal,
@@ -112,69 +100,61 @@ class SaleController extends Controller
                 'tax_value' => $taxValue,
                 'tax_amount' => $taxAmount,
                 'total_price' => $totalPrice,
-                'paid_amount' => $paidAmount,
-                'due_amount' => $dueAmount,
-                'sale_date' => $request->sale_date,
+                'quotation_date' => $request->quotation_date,
                 'note' => $request->note,
             ]);
 
             foreach ($itemsData as $itemData) {
-                $sale->items()->create($itemData);
-                Product::find($itemData['product_id'])->decrement('quantity', $itemData['quantity']);
+                $quotation->items()->create($itemData);
             }
         });
 
-        return redirect()->route('sales.index')->with('success', __('Sale saved successfully. Stock updated.'));
+        return redirect()->route('quotations.index')->with('success', __('Quotation saved successfully.'));
     }
 
-    public function show(Sale $sale)
+    public function show(Quotation $quotation)
     {
-        $sale->load('customer', 'items.product');
-        return view('sales.show', compact('sale'));
+        $quotation->load('customer', 'items.product');
+        return view('quotations.show', compact('quotation'));
     }
 
-    public function edit(Sale $sale)
+    public function edit(Quotation $quotation)
     {
-        $sale->load('items');
+        $quotation->load('items');
         $products = Product::all();
         $customers = Customer::orderBy('name')->get();
-        return view('sales.edit', compact('sale', 'products', 'customers'));
+        return view('quotations.edit', compact('quotation', 'products', 'customers'));
     }
 
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, Quotation $quotation)
     {
         $request->validate([
             'customer_id' => 'nullable|exists:customers,id',
             'customer_name' => 'nullable|string|max:255',
-            'sale_date' => 'required|date',
+            'quotation_date' => 'required|date',
             'discount' => 'nullable|numeric|min:0',
             'tax_type' => 'nullable|in:percentage,fixed',
             'tax_value' => 'nullable|numeric|min:0',
-            'paid_amount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.sell_price' => 'required|numeric|min:0',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($request, $sale) {
-            // Reverse old stock
-            foreach ($sale->items as $oldItem) {
-                Product::find($oldItem->product_id)->increment('quantity', $oldItem->quantity);
-            }
-            $sale->items()->delete();
+        DB::transaction(function () use ($request, $quotation) {
+            $quotation->items()->delete();
 
             $subtotal = 0;
             $itemsData = [];
 
             foreach ($request->items as $item) {
-                $lineTotal = $item['quantity'] * $item['sell_price'];
+                $lineTotal = $item['quantity'] * $item['unit_price'];
                 $subtotal += $lineTotal;
                 $itemsData[] = [
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'sell_price' => $item['sell_price'],
+                    'unit_price' => $item['unit_price'],
                     'total' => $lineTotal,
                 ];
             }
@@ -185,10 +165,8 @@ class SaleController extends Controller
             $taxValue = $request->tax_value ?? 0;
             $taxAmount = $taxType === 'percentage' ? ($afterDiscount * $taxValue / 100) : $taxValue;
             $totalPrice = $afterDiscount + $taxAmount;
-            $paidAmount = $request->paid_amount ?? 0;
-            $dueAmount = $totalPrice - $paidAmount;
 
-            $sale->update([
+            $quotation->update([
                 'customer_id' => $request->customer_id,
                 'customer_name' => $request->customer_name,
                 'subtotal' => $subtotal,
@@ -197,47 +175,43 @@ class SaleController extends Controller
                 'tax_value' => $taxValue,
                 'tax_amount' => $taxAmount,
                 'total_price' => $totalPrice,
-                'paid_amount' => $paidAmount,
-                'due_amount' => $dueAmount,
-                'sale_date' => $request->sale_date,
+                'quotation_date' => $request->quotation_date,
                 'note' => $request->note,
             ]);
 
             foreach ($itemsData as $itemData) {
-                $sale->items()->create($itemData);
-                Product::find($itemData['product_id'])->decrement('quantity', $itemData['quantity']);
+                $quotation->items()->create($itemData);
             }
         });
 
-        return redirect()->route('sales.index')->with('success', __('Sale updated successfully.'));
+        return redirect()->route('quotations.index')->with('success', __('Quotation updated successfully.'));
     }
 
-    public function destroy(Sale $sale)
+    public function destroy(Quotation $quotation)
     {
-        DB::transaction(function () use ($sale) {
-            foreach ($sale->items as $item) {
-                Product::find($item->product_id)->increment('quantity', $item->quantity);
-            }
-            $sale->delete();
-        });
-
-        return redirect()->route('sales.index')->with('success', __('Sale deleted. Stock adjusted.'));
+        $quotation->delete();
+        return redirect()->route('quotations.index')->with('success', __('Quotation deleted successfully.'));
     }
 
-    public function export()
+    public function downloadPdf(Quotation $quotation)
     {
-        return Excel::download(new SalesExport, 'sales.xlsx');
+        $quotation->load('customer', 'items.product');
+        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'));
+        return $pdf->download($quotation->quotation_no . '.pdf');
     }
 
-    public function import(Request $request)
+    public function sendEmail(Request $request, Quotation $quotation)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new SalesImport, $request->file('file'));
-        return redirect()->route('sales.index')->with('success', __('Sales imported successfully.'));
-    }
+        $request->validate([
+            'email' => 'required|email',
+        ]);
 
-    public function sampleExport()
-    {
-        return Excel::download(new SampleSalesExport, 'sample-sales.xlsx');
+        $quotation->load('customer', 'items.product');
+        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'));
+        $pdfContent = $pdf->output();
+
+        Mail::to($request->email)->send(new QuotationMail($quotation, $pdfContent));
+
+        return redirect()->route('quotations.show', $quotation)->with('success', __('Quotation emailed successfully.'));
     }
 }

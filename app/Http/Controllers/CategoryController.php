@@ -22,7 +22,8 @@ class CategoryController extends Controller
                     return \Str::limit($row->description, 50);
                 })
                 ->addColumn('products_count_badge', function ($row) {
-                    return '<span class="badge bg-info">' . $row->products_count . '</span>';
+                    $url = route('products.index', ['category_id' => $row->id]);
+                    return '<a href="' . $url . '" target="_blank"><span class="badge bg-info">' . $row->products_count . '</span></a>';
                 })
                 ->addColumn('action', function ($row) {
                     if (!auth()->user()->isAdmin()) {

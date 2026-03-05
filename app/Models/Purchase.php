@@ -11,6 +11,7 @@ class Purchase extends Model
 
     protected $fillable = [
         'purchase_no', 'supplier_id', 'subtotal', 'discount',
+        'tax_type', 'tax_value', 'tax_amount',
         'total_price', 'paid_amount', 'due_amount', 'purchase_date', 'note'
     ];
 
