@@ -25,6 +25,9 @@ class CategoryController extends Controller
                     return '<span class="badge bg-info">' . $row->products_count . '</span>';
                 })
                 ->addColumn('action', function ($row) {
+                    if (!auth()->user()->isAdmin()) {
+                        return '';
+                    }
                     $edit = route('categories.edit', $row);
                     $delete = route('categories.destroy', $row);
                     return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>

@@ -28,6 +28,9 @@ class SupplierController extends Controller
                     return \Str::limit($row->address, 40) ?? '-';
                 })
                 ->addColumn('action', function ($row) {
+                    if (!auth()->user()->isAdmin()) {
+                        return '';
+                    }
                     $edit = route('suppliers.edit', $row);
                     $delete = route('suppliers.destroy', $row);
                     return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>

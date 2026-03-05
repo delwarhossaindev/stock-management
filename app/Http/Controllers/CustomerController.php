@@ -22,6 +22,9 @@ class CustomerController extends Controller
                 ->editColumn('phone', fn($row) => $row->phone ?? '-')
                 ->addColumn('address_short', fn($row) => \Str::limit($row->address, 40) ?? '-')
                 ->addColumn('action', function ($row) {
+                    if (!auth()->user()->isAdmin()) {
+                        return '';
+                    }
                     $edit = route('customers.edit', $row);
                     $delete = route('customers.destroy', $row);
                     return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>

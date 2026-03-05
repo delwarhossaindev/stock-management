@@ -5,7 +5,9 @@
     <h4>{{ __('Sales') }}</h4>
     <div>
         <a href="{{ route('sales.export') }}" class="btn btn-success"><i class="bi bi-download"></i> {{ __('Export') }}</a>
+        @if(auth()->user()->isAdmin())
         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bi bi-upload"></i> {{ __('Import') }}</button>
+        @endif
         <a href="{{ route('sales.create') }}" class="btn btn-primary"><i class="bi bi-plus"></i> {{ __('New Sale') }}</a>
     </div>
 </div>
@@ -28,6 +30,7 @@
     </div>
 </div>
 
+@if(auth()->user()->isAdmin())
 <!-- Import Modal -->
 <div class="modal fade" id="importModal" tabindex="-1">
     <div class="modal-dialog">
@@ -56,6 +59,7 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('scripts')
