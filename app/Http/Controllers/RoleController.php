@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class RoleController extends Controller
@@ -16,7 +16,7 @@ class RoleController extends Controller
             return DataTables::of($roles)
                 ->addIndexColumn()
                 ->addColumn('name_display', function ($row) {
-                    $badge = $row->is_protected ? ' <span class="badge bg-danger">' . __('Protected') . '</span>' : '';
+                    $badge = $row->name === 'admin' ? ' <span class="badge bg-danger">' . __('Protected') . '</span>' : '';
                     return '<strong>' . e($row->name) . '</strong>' . $badge;
                 })
                 ->addColumn('users_count_badge', function ($row) {
@@ -27,11 +27,11 @@ class RoleController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('roles.edit')) {
+                    if (auth()->user()->can('roles.edit')) {
                         $edit = route('roles.edit', $row);
                         $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a> ';
                     }
-                    if (auth()->user()->hasPermission('roles.delete') && !$row->is_protected) {
+                    if (auth()->user()->can('roles.delete') && $row->name !== 'admin') {
                         $delete = route('roles.destroy', $row);
                         $btn .= '<form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '
@@ -48,7 +48,9 @@ class RoleController extends Controller
 
     public function create()
     {
-        $permissions = Permission::orderBy('group')->orderBy('name')->get()->groupBy('group');
+        $permissions = Permission::orderBy('name')->get()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0];
+        });
         return view('roles.create', compact('permissions'));
     }
 
@@ -60,19 +62,20 @@ class RoleController extends Controller
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => 'web',
-        ]);
+        $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
 
-        $role->permissions()->sync($request->permissions ?? []);
+        if ($request->permissions) {
+            $role->syncPermissions(Permission::whereIn('id', $request->permissions)->get());
+        }
 
         return redirect()->route('roles.index')->with('success', __('Role created successfully.'));
     }
 
     public function edit(Role $role)
     {
-        $permissions = Permission::orderBy('group')->orderBy('name')->get()->groupBy('group');
+        $permissions = Permission::orderBy('name')->get()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0];
+        });
         $rolePermissionIds = $role->permissions->pluck('id')->toArray();
         return view('roles.edit', compact('role', 'permissions', 'rolePermissionIds'));
     }
@@ -87,11 +90,10 @@ class RoleController extends Controller
 
         $role->update(['name' => $request->name]);
 
-        if ($role->is_protected) {
-            // Admin role always gets all permissions
-            $role->permissions()->sync(Permission::pluck('id')->toArray());
+        if ($role->name === 'admin') {
+            $role->syncPermissions(Permission::all());
         } else {
-            $role->permissions()->sync($request->permissions ?? []);
+            $role->syncPermissions(Permission::whereIn('id', $request->permissions ?? [])->get());
         }
 
         return redirect()->route('roles.index')->with('success', __('Role updated successfully.'));
@@ -99,7 +101,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
-        if ($role->is_protected) {
+        if ($role->name === 'admin') {
             return redirect()->route('roles.index')->with('error', __('This role cannot be deleted.'));
         }
 

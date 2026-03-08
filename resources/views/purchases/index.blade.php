@@ -5,7 +5,7 @@
     <h4>{{ __('Purchases') }}</h4>
     <div>
         <a href="{{ route('purchases.export') }}" class="btn btn-success"><i class="bi bi-download"></i> {{ __('Export') }}</a>
-        @if(auth()->user()->hasPermission('purchases.create'))
+        @if(auth()->user()->can('purchases.create'))
         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bi bi-upload"></i> {{ __('Import') }}</button>
         @endif
         <a href="{{ route('purchases.create') }}" class="btn btn-primary"><i class="bi bi-plus"></i> {{ __('New Purchase') }}</a>
@@ -30,7 +30,7 @@
     </div>
 </div>
 
-@if(auth()->user()->hasPermission('purchases.create'))
+@if(auth()->user()->can('purchases.create'))
 <!-- Import Modal -->
 <div class="modal fade" id="importModal" tabindex="-1">
     <div class="modal-dialog">

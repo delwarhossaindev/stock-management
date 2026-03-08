@@ -18,10 +18,10 @@ class ExpenseController extends Controller
                 ->addColumn('amount_fmt', fn($row) => '৳'.number_format($row->amount, 2))
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('expenses.edit')) {
+                    if (auth()->user()->can('expenses.edit')) {
                         $btn .= '<a href="'.route('expenses.edit', $row).'" class="btn btn-sm btn-warning" title="'.__('Edit').'"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('expenses.delete')) {
+                    if (auth()->user()->can('expenses.delete')) {
                         $btn .= ' <form action="'.route('expenses.destroy', $row).'" method="POST" class="d-inline" onsubmit="return confirm(\''.__('Are you sure?').'\')">
                                 '.csrf_field().method_field('DELETE').'
                                 <button class="btn btn-sm btn-danger" title="'.__('Delete').'"><i class="bi bi-trash"></i></button>

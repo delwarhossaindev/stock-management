@@ -4,14 +4,15 @@
     <meta charset="utf-8">
     <title>{{ $quotation->quotation_no }}</title>
     <style>
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; color: #333; margin: 0; padding: 20px; }
+        body { font-family: freeserif; font-size: 12px; color: #333; margin: 0; padding: 20px; }
+        h1, h2, h3, strong, b, th { font-weight: normal; }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0d6efd; padding-bottom: 15px; }
         .header h1 { margin: 0; font-size: 22px; color: #0d6efd; }
         .header p { margin: 5px 0 0; color: #666; }
         .info-table { width: 100%; margin-bottom: 20px; }
         .info-table td { padding: 4px 0; vertical-align: top; }
         .info-table .label { color: #666; font-size: 11px; text-transform: uppercase; }
-        .info-table .value { font-weight: bold; font-size: 13px; }
+        .info-table .value { font-size: 13px; }
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .items-table th { background: #0d6efd; color: #fff; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; }
         .items-table td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
@@ -20,9 +21,9 @@
         .text-center { text-align: center; }
         .summary-table { width: 300px; margin-left: auto; border-collapse: collapse; }
         .summary-table td { padding: 6px 10px; }
-        .summary-table .total-row td { border-top: 2px solid #0d6efd; font-size: 14px; font-weight: bold; color: #0d6efd; }
+        .summary-table .total-row td { border-top: 2px solid #0d6efd; font-size: 14px; color: #0d6efd; }
         .note { margin-top: 20px; padding: 10px; background: #f8f9fa; border-left: 3px solid #0d6efd; }
-        .note-label { font-weight: bold; margin-bottom: 5px; }
+        .note-label { margin-bottom: 5px; }
         .footer { margin-top: 40px; text-align: center; color: #999; font-size: 10px; border-top: 1px solid #ddd; padding-top: 10px; }
     </style>
 </head>

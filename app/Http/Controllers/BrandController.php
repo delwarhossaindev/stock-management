@@ -14,10 +14,10 @@ class BrandController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="'.route('brands.show', $row).'" class="btn btn-sm btn-info" title="'.__('View').'" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->hasPermission('brands.edit')) {
+                    if (auth()->user()->can('brands.edit')) {
                         $btn .= ' <a href="'.route('brands.edit', $row).'" class="btn btn-sm btn-warning" title="'.__('Edit').'" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('brands.delete')) {
+                    if (auth()->user()->can('brands.delete')) {
                         $btn .= ' <form action="'.route('brands.destroy', $row).'" method="POST" class="d-inline" onsubmit="return confirm(\''.__('Are you sure?').'\')">
                                 '.csrf_field().method_field('DELETE').'
                                 <button class="btn btn-sm btn-danger" title="'.__('Delete').'" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>

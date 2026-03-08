@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -13,22 +15,25 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $users = User::latest();
+            $users = User::with('roles')->latest();
             return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('role_badge', function ($row) {
-                    $class = $row->role === 'admin' ? 'bg-danger' : 'bg-secondary';
-                    $label = $row->role === 'admin' ? __('admin') : __('user');
-                    return '<span class="badge ' . $class . '">' . $label . '</span>';
+                    $roleName = $row->roles->first()->name ?? 'user';
+                    $class = $roleName === 'admin' ? 'bg-danger' : 'bg-secondary';
+                    return '<span class="badge ' . $class . '">' . __(e($roleName)) . '</span>';
                 })
                 ->addColumn('joined', function ($row) {
                     return $row->created_at->format('d/m/Y');
                 })
                 ->addColumn('action', function ($row) {
-                    $edit = route('users.edit', $row);
-                    $delete = route('users.destroy', $row);
-                    $btn = '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
-                    if ($row->id !== auth()->id()) {
+                    $btn = '';
+                    if (auth()->user()->can('users.edit')) {
+                        $edit = route('users.edit', $row);
+                        $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
+                    }
+                    if (auth()->user()->can('users.delete') && $row->id !== auth()->id()) {
+                        $delete = route('users.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
@@ -44,7 +49,11 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+        $permissions = Permission::orderBy('name')->get()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0];
+        });
+        return view('users.create', compact('roles', 'permissions'));
     }
 
     public function store(Request $request)
@@ -53,15 +62,22 @@ class UserController extends Controller
             'name' => 'required|string|max:191',
             'email' => 'required|email|max:191|unique:users,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:admin,user',
+            'role' => 'required|exists:roles,name',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
         ]);
+
+        $user->assignRole($request->role);
+
+        if ($request->permissions) {
+            $user->syncPermissions(Permission::whereIn('id', $request->permissions)->get());
+        }
 
         return redirect()->route('users.index')->with('success', __('User created successfully.'));
     }
@@ -73,7 +89,12 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $roles = Role::all();
+        $permissions = Permission::orderBy('name')->get()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0];
+        });
+        $userPermissionIds = $user->getDirectPermissions()->pluck('id')->toArray();
+        return view('users.edit', compact('user', 'roles', 'permissions', 'userPermissionIds'));
     }
 
     public function update(Request $request, User $user)
@@ -82,13 +103,14 @@ class UserController extends Controller
             'name' => 'required|string|max:191',
             'email' => 'required|email|max:191|unique:users,email,' . $user->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:admin,user',
+            'role' => 'required|exists:roles,name',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
         ];
 
         if ($request->filled('password')) {
@@ -96,6 +118,8 @@ class UserController extends Controller
         }
 
         $user->update($data);
+        $user->syncRoles($request->role);
+        $user->syncPermissions(Permission::whereIn('id', $request->permissions ?? [])->get());
 
         return redirect()->route('users.index')->with('success', __('User updated successfully.'));
     }

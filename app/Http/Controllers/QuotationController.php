@@ -6,7 +6,7 @@ use App\Mail\QuotationMail;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quotation;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -27,11 +27,11 @@ class QuotationController extends Controller
                 ->addColumn('action', function ($row) {
                     $show = route('quotations.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->hasPermission('quotations.edit')) {
+                    if (auth()->user()->can('quotations.edit')) {
                         $edit = route('quotations.edit', $row);
                         $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('quotations.delete')) {
+                    if (auth()->user()->can('quotations.delete')) {
                         $delete = route('quotations.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
@@ -198,7 +198,7 @@ class QuotationController extends Controller
     public function downloadPdf(Quotation $quotation)
     {
         $quotation->load('customer', 'items.product');
-        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'));
+        $pdf = LaravelMpdf::loadView('quotations.pdf', compact('quotation'));
         return $pdf->download($quotation->quotation_no . '.pdf');
     }
 
@@ -209,7 +209,7 @@ class QuotationController extends Controller
         ]);
 
         $quotation->load('customer', 'items.product');
-        $pdf = Pdf::loadView('quotations.pdf', compact('quotation'));
+        $pdf = LaravelMpdf::loadView('quotations.pdf', compact('quotation'));
         $pdfContent = $pdf->output();
 
         Mail::to($request->email)->send(new QuotationMail($quotation, $pdfContent));

@@ -10,6 +10,7 @@ use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -228,6 +229,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class)->only(['create', 'store'])->middleware('permission:roles.create');
     Route::resource('roles', RoleController::class)->only(['edit', 'update'])->middleware('permission:roles.edit');
     Route::resource('roles', RoleController::class)->only(['destroy'])->middleware('permission:roles.delete');
+
+    Route::resource('permissions', PermissionController::class)->only(['index'])->middleware('permission:permissions.view');
+    Route::resource('permissions', PermissionController::class)->only(['create', 'store'])->middleware('permission:permissions.create');
+    Route::resource('permissions', PermissionController::class)->only(['edit', 'update'])->middleware('permission:permissions.edit');
+    Route::resource('permissions', PermissionController::class)->only(['destroy'])->middleware('permission:permissions.delete');
 
     // --- Settings ---
     Route::middleware('permission:settings.manage')->group(function () {

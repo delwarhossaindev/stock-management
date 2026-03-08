@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4>{{ __('Expense Categories') }}</h4>
-    @if(auth()->user()->hasPermission('expense-categories.create'))
+    @if(auth()->user()->can('expense-categories.create'))
     <a href="{{ route('expense-categories.create') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> {{ __('New Category') }}</a>
     @endif
 </div>

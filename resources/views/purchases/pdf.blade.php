@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>{{ __('Invoice') }} - {{ $purchase->purchase_no }}</title>
     <style>
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; color: #333; }
+        body { font-family: freeserif; font-size: 12px; color: #333; }
+        h1, h2, h3, strong, b, th { font-weight: normal; }
         .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; }
         .header h2 { margin: 0; color: #4f46e5; }
         .info-table { width: 100%; margin-bottom: 15px; }
@@ -14,7 +15,7 @@
         .items-table td { padding: 6px 8px; border-bottom: 1px solid #eee; }
         .summary { width: 300px; float: right; }
         .summary td { padding: 4px 8px; }
-        .summary .total { font-weight: bold; font-size: 14px; border-top: 2px solid #333; }
+        .summary .total { font-size: 14px; border-top: 2px solid #333; }
         .footer { clear: both; text-align: center; margin-top: 40px; font-size: 10px; color: #999; }
     </style>
 </head>
@@ -29,11 +30,11 @@
 
     <table class="info-table">
         <tr>
-            <td><strong>{{ __('Purchase No') }}:</strong> {{ $purchase->purchase_no }}</td>
-            <td style="text-align:right"><strong>{{ __('Date') }}:</strong> {{ $purchase->purchase_date->format('d/m/Y') }}</td>
+            <td>{{ __('Purchase No') }}: {{ $purchase->purchase_no }}</td>
+            <td style="text-align:right">{{ __('Date') }}: {{ $purchase->purchase_date->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td><strong>{{ __('Supplier') }}:</strong> {{ $purchase->supplier->name ?? '-' }}</td>
+            <td>{{ __('Supplier') }}: {{ $purchase->supplier->name ?? '-' }}</td>
             <td></td>
         </tr>
     </table>

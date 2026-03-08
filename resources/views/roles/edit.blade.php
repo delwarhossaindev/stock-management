@@ -12,10 +12,10 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">{{ __('Role Name') }} <span class="text-danger">*</span></label>
-                    <input type="text" name="name" class="form-control" value="{{ old('name', $role->name) }}" required {{ $role->is_protected ? 'readonly' : '' }}>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $role->name) }}" required {{ $role->name === 'admin' ? 'readonly' : '' }}>
                 </div>
             </div>
-            @if($role->is_protected)
+            @if($role->name === 'admin')
             <div class="alert alert-info mb-0">
                 <i class="bi bi-info-circle"></i> {{ __('Admin role always has all permissions.') }}
             </div>
@@ -33,7 +33,7 @@
                         <div class="card-header py-2 d-flex align-items-center">
                             <div class="form-check">
                                 <input class="form-check-input select-all-group" type="checkbox" id="group-{{ $group }}"
-                                    {{ $role->is_protected ? 'checked disabled' : '' }}>
+                                    {{ $role->name === 'admin' ? 'checked disabled' : '' }}>
                                 <label class="form-check-label fw-bold" for="group-{{ $group }}">{{ __(ucfirst(str_replace('-', ' ', $group))) }}</label>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                             <div class="form-check">
                                 <input class="form-check-input perm-checkbox" type="checkbox" name="permissions[]" value="{{ $perm->id }}" id="perm-{{ $perm->id }}"
                                     {{ in_array($perm->id, old('permissions', $rolePermissionIds)) ? 'checked' : '' }}
-                                    {{ $role->is_protected ? 'disabled' : '' }}>
+                                    {{ $role->name === 'admin' ? 'disabled' : '' }}>
                                 <label class="form-check-label" for="perm-{{ $perm->id }}">
                                     {{ __(ucfirst(str_replace('.', ' ', str_replace($group . '.', '', $perm->name)))) }}
                                 </label>

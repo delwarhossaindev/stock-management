@@ -29,11 +29,11 @@ class SupplierController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('suppliers.edit')) {
+                    if (auth()->user()->can('suppliers.edit')) {
                         $edit = route('suppliers.edit', $row);
                         $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('suppliers.delete')) {
+                    if (auth()->user()->can('suppliers.delete')) {
                         $delete = route('suppliers.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '

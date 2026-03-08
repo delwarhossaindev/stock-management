@@ -11,7 +11,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -37,11 +37,11 @@ class SaleController extends Controller
                 ->addColumn('action', function ($row) {
                     $show = route('sales.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->hasPermission('sales.edit')) {
+                    if (auth()->user()->can('sales.edit')) {
                         $edit = route('sales.edit', $row);
                         $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('sales.delete')) {
+                    if (auth()->user()->can('sales.delete')) {
                         $delete = route('sales.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this sale? Stock will be adjusted.') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
@@ -247,7 +247,7 @@ class SaleController extends Controller
     public function downloadPdf(Sale $sale)
     {
         $sale->load('customer', 'items.product');
-        $pdf = Pdf::loadView('sales.pdf', compact('sale'));
+        $pdf = LaravelMpdf::loadView('sales.pdf', compact('sale'));
 
         return $pdf->download('sale-invoice-' . $sale->invoice_no . '.pdf');
     }

@@ -17,27 +17,30 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Roles & Permissions first
+        $this->call(RolePermissionSeeder::class);
+
         // Users
-        User::create([
+        $admin = User::create([
             'name' => 'অ্যাডমিন',
             'email' => 'admin@admin.com',
             'password' => bcrypt('password'),
-            'role' => 'admin',
         ]);
+        $admin->assignRole('admin');
 
-        User::create([
+        $user1 = User::create([
             'name' => 'রহিম উদ্দিন',
             'email' => 'rahim@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
         ]);
+        $user1->assignRole('user');
 
-        User::create([
+        $user2 = User::create([
             'name' => 'করিম হোসেন',
             'email' => 'karim@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
         ]);
+        $user2->assignRole('user');
 
         // Categories
         $electronics = Category::create(['name' => 'ইলেকট্রনিক্স', 'description' => 'ইলেকট্রনিক ডিভাইস ও আনুষাঙ্গিক']);

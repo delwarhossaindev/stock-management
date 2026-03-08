@@ -23,11 +23,11 @@ class CustomerController extends Controller
                 ->addColumn('address_short', fn($row) => \Str::limit($row->address, 40) ?? '-')
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('customers.edit')) {
+                    if (auth()->user()->can('customers.edit')) {
                         $edit = route('customers.edit', $row);
                         $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('customers.delete')) {
+                    if (auth()->user()->can('customers.delete')) {
                         $delete = route('customers.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '

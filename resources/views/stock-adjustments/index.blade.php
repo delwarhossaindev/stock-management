@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4>{{ __('Stock Adjustments') }}</h4>
-    @if(auth()->user()->hasPermission('stock-adjustments.create'))
+    @if(auth()->user()->can('stock-adjustments.create'))
     <a href="{{ route('stock-adjustments.create') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> {{ __('New Adjustment') }}</a>
     @endif
 </div>

@@ -27,11 +27,11 @@ class CategoryController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('categories.edit')) {
+                    if (auth()->user()->can('categories.edit')) {
                         $edit = route('categories.edit', $row);
                         $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('categories.delete')) {
+                    if (auth()->user()->can('categories.delete')) {
                         $delete = route('categories.destroy', $row);
                         $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '

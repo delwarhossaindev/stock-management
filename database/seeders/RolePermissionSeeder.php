@@ -2,14 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         $permissionsMap = [
             'dashboard' => ['dashboard.view'],
             'categories' => ['categories.view', 'categories.create', 'categories.edit', 'categories.delete'],
@@ -33,35 +36,28 @@ class RolePermissionSeeder extends Seeder
             'reports' => ['reports.view'],
             'users' => ['users.view', 'users.create', 'users.edit', 'users.delete'],
             'roles' => ['roles.view', 'roles.create', 'roles.edit', 'roles.delete'],
+            'permissions' => ['permissions.view', 'permissions.create', 'permissions.edit', 'permissions.delete'],
             'settings' => ['settings.manage'],
             'backups' => ['backups.manage'],
             'activity-logs' => ['activity-logs.view'],
         ];
 
         // Create all permissions
-        $allPermissionIds = [];
-        foreach ($permissionsMap as $group => $permissions) {
+        $allPermissions = [];
+        foreach ($permissionsMap as $permissions) {
             foreach ($permissions as $permName) {
-                $perm = Permission::firstOrCreate(
-                    ['name' => $permName],
-                    ['group' => $group]
+                $allPermissions[] = Permission::firstOrCreate(
+                    ['name' => $permName, 'guard_name' => 'web']
                 );
-                $allPermissionIds[] = $perm->id;
             }
         }
 
         // Admin role - all permissions
-        $adminRole = Role::firstOrCreate(
-            ['name' => 'admin'],
-            ['guard_name' => 'web', 'is_protected' => true]
-        );
-        $adminRole->permissions()->syncWithoutDetaching($allPermissionIds);
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $adminRole->syncPermissions($allPermissions);
 
-        // User role - limited permissions (matching current route setup)
-        $userRole = Role::firstOrCreate(
-            ['name' => 'user'],
-            ['guard_name' => 'web', 'is_protected' => false]
-        );
+        // User role - limited permissions
+        $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
 
         $userPermissions = [
             'dashboard.view',
@@ -80,7 +76,6 @@ class RolePermissionSeeder extends Seeder
             'reports.view',
         ];
 
-        $userPermIds = Permission::whereIn('name', $userPermissions)->pluck('id')->toArray();
-        $userRole->permissions()->syncWithoutDetaching($userPermIds);
+        $userRole->syncPermissions($userPermissions);
     }
 }

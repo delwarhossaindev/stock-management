@@ -13,10 +13,10 @@ class ExpenseCategoryController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn = '';
-                    if (auth()->user()->hasPermission('expense-categories.edit')) {
+                    if (auth()->user()->can('expense-categories.edit')) {
                         $btn .= '<a href="'.route('expense-categories.edit', $row).'" class="btn btn-sm btn-warning" title="'.__('Edit').'"><i class="bi bi-pencil"></i></a>';
                     }
-                    if (auth()->user()->hasPermission('expense-categories.delete')) {
+                    if (auth()->user()->can('expense-categories.delete')) {
                         $btn .= ' <form action="'.route('expense-categories.destroy', $row).'" method="POST" class="d-inline" onsubmit="return confirm(\''.__('Are you sure?').'\')">
                                 '.csrf_field().method_field('DELETE').'
                                 <button class="btn btn-sm btn-danger" title="'.__('Delete').'"><i class="bi bi-trash"></i></button>

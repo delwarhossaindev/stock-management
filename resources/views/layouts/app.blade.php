@@ -559,49 +559,49 @@
             </li>
 
             <div class="sidebar-section">{{ __('Inventory') }}</div>
-            @if(auth()->user()->hasPermission('categories.view'))
+            @if(auth()->user()->can('categories.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
                     <i class="bi bi-tags"></i> {{ __('Categories') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('brands.view'))
+            @if(auth()->user()->can('brands.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}" href="{{ route('brands.index') }}">
                     <i class="bi bi-bookmark-star"></i> {{ __('Brands') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('units.view'))
+            @if(auth()->user()->can('units.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('units.*') ? 'active' : '' }}" href="{{ route('units.index') }}">
                     <i class="bi bi-rulers"></i> {{ __('Units') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('products.view'))
+            @if(auth()->user()->can('products.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
                     <i class="bi bi-box"></i> {{ __('Products') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('warehouses.view'))
+            @if(auth()->user()->can('warehouses.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('warehouses.*') ? 'active' : '' }}" href="{{ route('warehouses.index') }}">
                     <i class="bi bi-building"></i> {{ __('Warehouses') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('suppliers.view'))
+            @if(auth()->user()->can('suppliers.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
                     <i class="bi bi-people"></i> {{ __('Suppliers') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('customers.view'))
+            @if(auth()->user()->can('customers.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}">
                     <i class="bi bi-person-lines-fill"></i> {{ __('Customers') }}
@@ -610,56 +610,56 @@
             @endif
 
             <div class="sidebar-section">{{ __('Transactions') }}</div>
-            @if(auth()->user()->hasPermission('pos.access'))
+            @if(auth()->user()->can('pos.access'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">
                     <i class="bi bi-tv"></i> {{ __('POS') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('purchases.view'))
+            @if(auth()->user()->can('purchases.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}" href="{{ route('purchases.index') }}">
                     <i class="bi bi-cart-plus"></i> {{ __('Purchases') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('sales.view'))
+            @if(auth()->user()->can('sales.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">
                     <i class="bi bi-cart-check"></i> {{ __('Sales') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('quotations.view'))
+            @if(auth()->user()->can('quotations.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('quotations.*') ? 'active' : '' }}" href="{{ route('quotations.index') }}">
                     <i class="bi bi-file-earmark-text"></i> {{ __('Quotations') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('purchase-returns.view'))
+            @if(auth()->user()->can('purchase-returns.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('purchase-returns.*') ? 'active' : '' }}" href="{{ route('purchase-returns.index') }}">
                     <i class="bi bi-arrow-return-left"></i> {{ __('Purchase Returns') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('sale-returns.view'))
+            @if(auth()->user()->can('sale-returns.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('sale-returns.*') ? 'active' : '' }}" href="{{ route('sale-returns.index') }}">
                     <i class="bi bi-arrow-return-right"></i> {{ __('Sale Returns') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('payments.view'))
+            @if(auth()->user()->can('payments.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('payments.*') ? 'active' : '' }}" href="{{ route('payments.index') }}">
                     <i class="bi bi-cash-stack"></i> {{ __('Payments') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('expenses.view'))
+            @if(auth()->user()->can('expenses.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('expenses.*') || request()->routeIs('expense-categories.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}">
                     <i class="bi bi-wallet2"></i> {{ __('Expenses') }}
@@ -668,14 +668,14 @@
             @endif
 
             <div class="sidebar-section">{{ __('Stock') }}</div>
-            @if(auth()->user()->hasPermission('stock-adjustments.view'))
+            @if(auth()->user()->can('stock-adjustments.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('stock-adjustments.*') ? 'active' : '' }}" href="{{ route('stock-adjustments.index') }}">
                     <i class="bi bi-sliders"></i> {{ __('Stock Adjustments') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('notifications.view'))
+            @if(auth()->user()->can('notifications.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
                     <i class="bi bi-bell"></i> {{ __('Notifications') }}
@@ -683,7 +683,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('reports.view'))
+            @if(auth()->user()->can('reports.view'))
             <div class="sidebar-section">{{ __('Reports') }}</div>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('reports.stock') ? 'active' : '' }}" href="{{ route('reports.stock') }}">
@@ -707,44 +707,51 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('roles.view') || auth()->user()->hasPermission('expense-categories.view') || auth()->user()->hasPermission('activity-logs.view') || auth()->user()->hasPermission('backups.manage') || auth()->user()->hasPermission('settings.manage'))
+            @if(auth()->user()->can('users.view') || auth()->user()->can('roles.view') || auth()->user()->can('permissions.view') || auth()->user()->can('expense-categories.view') || auth()->user()->can('activity-logs.view') || auth()->user()->can('backups.manage') || auth()->user()->can('settings.manage'))
             <div class="sidebar-section">{{ __('Admin') }}</div>
-            @if(auth()->user()->hasPermission('users.view'))
+            @if(auth()->user()->can('users.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                     <i class="bi bi-person-gear"></i> {{ __('Users') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('roles.view'))
+            @if(auth()->user()->can('roles.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
-                    <i class="bi bi-shield-lock"></i> {{ __('Roles & Permissions') }}
+                    <i class="bi bi-shield-lock"></i> {{ __('Roles') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('expense-categories.view'))
+            @if(auth()->user()->can('permissions.view'))
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}">
+                    <i class="bi bi-key"></i> {{ __('Permissions') }}
+                </a>
+            </li>
+            @endif
+            @if(auth()->user()->can('expense-categories.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}">
                     <i class="bi bi-list-check"></i> {{ __('Expense Categories') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('activity-logs.view'))
+            @if(auth()->user()->can('activity-logs.view'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}" href="{{ route('activity-logs.index') }}">
                     <i class="bi bi-clock-history"></i> {{ __('Activity Log') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('backups.manage'))
+            @if(auth()->user()->can('backups.manage'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('backups.*') ? 'active' : '' }}" href="{{ route('backups.index') }}">
                     <i class="bi bi-hdd"></i> {{ __('Database Backup') }}
                 </a>
             </li>
             @endif
-            @if(auth()->user()->hasPermission('settings.manage'))
+            @if(auth()->user()->can('settings.manage'))
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}">
                     <i class="bi bi-gear"></i> {{ __('Settings') }}
@@ -756,7 +763,7 @@
 
         <div class="user-info mt-auto">
             <div class="name"><i class="bi bi-person-circle"></i> <span>{{ Auth::user()->name }}</span></div>
-            <div class="role">{{ __(Auth::user()->role->name) }}</div>
+            <div class="role">{{ __(Auth::user()->getRoleNames()->first()) }}</div>
             <div class="lang-switch mt-2 mb-2">
                 <i class="bi bi-translate" style="color:#64748b;"></i>
                 <a href="{{ route('language.switch', 'bn') }}" class="{{ app()->getLocale() === 'bn' ? 'active-lang' : '' }}">বাংলা</a>
