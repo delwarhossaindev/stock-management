@@ -11,6 +11,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -36,11 +37,13 @@ class SaleController extends Controller
                 ->addColumn('action', function ($row) {
                     $show = route('sales.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->isAdmin()) {
+                    if (auth()->user()->hasPermission('sales.edit')) {
                         $edit = route('sales.edit', $row);
+                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
+                    }
+                    if (auth()->user()->hasPermission('sales.delete')) {
                         $delete = route('sales.destroy', $row);
-                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                            <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this sale? Stock will be adjusted.') . '\')">
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this sale? Stock will be adjusted.') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                             </form>';
@@ -239,5 +242,13 @@ class SaleController extends Controller
     public function sampleExport()
     {
         return Excel::download(new SampleSalesExport, 'sample-sales.xlsx');
+    }
+
+    public function downloadPdf(Sale $sale)
+    {
+        $sale->load('customer', 'items.product');
+        $pdf = Pdf::loadView('sales.pdf', compact('sale'));
+
+        return $pdf->download('sale-invoice-' . $sale->invoice_no . '.pdf');
     }
 }

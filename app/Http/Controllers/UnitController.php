@@ -23,16 +23,19 @@ class UnitController extends Controller
                     return '<a href="' . $url . '" target="_blank"><span class="badge bg-info">' . $row->products_count . '</span></a>';
                 })
                 ->addColumn('action', function ($row) {
-                    if (!auth()->user()->isAdmin()) {
-                        return '';
+                    $btn = '';
+                    if (auth()->user()->hasPermission('units.edit')) {
+                        $edit = route('units.edit', $row);
+                        $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    $edit = route('units.edit', $row);
-                    $delete = route('units.destroy', $row);
-                    return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                        <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
+                    if (auth()->user()->hasPermission('units.delete')) {
+                        $delete = route('units.destroy', $row);
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                         </form>';
+                    }
+                    return $btn;
                 })
                 ->rawColumns(['products_count_badge', 'action'])
                 ->make(true);

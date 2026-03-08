@@ -10,7 +10,7 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!auth()->check() || auth()->user()->role !== $role) {
+        if (!auth()->check() || auth()->user()->role->name !== $role) {
             abort(403, __('Unauthorized. You do not have permission to access this page.'));
         }
 

@@ -11,6 +11,7 @@ use App\Models\PurchaseItem;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -34,11 +35,13 @@ class PurchaseController extends Controller
                 ->addColumn('action', function ($row) {
                     $show = route('purchases.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->isAdmin()) {
+                    if (auth()->user()->hasPermission('purchases.edit')) {
                         $edit = route('purchases.edit', $row);
+                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
+                    }
+                    if (auth()->user()->hasPermission('purchases.delete')) {
                         $delete = route('purchases.destroy', $row);
-                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                            <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this purchase? Stock will be adjusted.') . '\')">
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Delete this purchase? Stock will be adjusted.') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                             </form>';
@@ -237,5 +240,13 @@ class PurchaseController extends Controller
     public function sampleExport()
     {
         return Excel::download(new SamplePurchasesExport, 'sample-purchases.xlsx');
+    }
+
+    public function downloadPdf(Purchase $purchase)
+    {
+        $purchase->load('supplier', 'items.product');
+        $pdf = Pdf::loadView('purchases.pdf', compact('purchase'));
+
+        return $pdf->download('purchase-invoice-' . $purchase->purchase_no . '.pdf');
     }
 }

@@ -27,11 +27,13 @@ class QuotationController extends Controller
                 ->addColumn('action', function ($row) {
                     $show = route('quotations.show', $row);
                     $btn = '<a href="' . $show . '" class="btn btn-sm btn-info" title="' . __('View') . '" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>';
-                    if (auth()->user()->isAdmin()) {
+                    if (auth()->user()->hasPermission('quotations.edit')) {
                         $edit = route('quotations.edit', $row);
+                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
+                    }
+                    if (auth()->user()->hasPermission('quotations.delete')) {
                         $delete = route('quotations.destroy', $row);
-                        $btn .= ' <a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                            <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                             </form>';

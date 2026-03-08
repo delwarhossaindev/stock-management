@@ -22,16 +22,19 @@ class CustomerController extends Controller
                 ->editColumn('phone', fn($row) => $row->phone ?? '-')
                 ->addColumn('address_short', fn($row) => \Str::limit($row->address, 40) ?? '-')
                 ->addColumn('action', function ($row) {
-                    if (!auth()->user()->isAdmin()) {
-                        return '';
+                    $btn = '';
+                    if (auth()->user()->hasPermission('customers.edit')) {
+                        $edit = route('customers.edit', $row);
+                        $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    $edit = route('customers.edit', $row);
-                    $delete = route('customers.destroy', $row);
-                    return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                        <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
+                    if (auth()->user()->hasPermission('customers.delete')) {
+                        $delete = route('customers.destroy', $row);
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                         </form>';
+                    }
+                    return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);

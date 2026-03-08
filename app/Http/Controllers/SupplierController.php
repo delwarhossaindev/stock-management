@@ -28,16 +28,19 @@ class SupplierController extends Controller
                     return \Str::limit($row->address, 40) ?? '-';
                 })
                 ->addColumn('action', function ($row) {
-                    if (!auth()->user()->isAdmin()) {
-                        return '';
+                    $btn = '';
+                    if (auth()->user()->hasPermission('suppliers.edit')) {
+                        $edit = route('suppliers.edit', $row);
+                        $btn .= '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>';
                     }
-                    $edit = route('suppliers.edit', $row);
-                    $delete = route('suppliers.destroy', $row);
-                    return '<a href="' . $edit . '" class="btn btn-sm btn-warning" title="' . __('Edit') . '" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
-                        <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
+                    if (auth()->user()->hasPermission('suppliers.delete')) {
+                        $delete = route('suppliers.destroy', $row);
+                        $btn .= ' <form action="' . $delete . '" method="POST" class="d-inline" onsubmit="return confirm(\'' . __('Are you sure?') . '\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button class="btn btn-sm btn-danger" title="' . __('Delete') . '" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></button>
                         </form>';
+                    }
+                    return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);

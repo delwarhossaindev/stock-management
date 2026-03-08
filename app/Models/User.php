@@ -21,13 +21,46 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'language',
     ];
 
+    protected $cachedPermissions = null;
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        $role = $this->getRelationValue('role');
+        if ($role instanceof Role) {
+            return $role->name === 'admin';
+        }
+        // Fallback for legacy string role attribute (before role_id migration)
+        return $this->getAttribute('role') === 'admin';
+    }
+
+    public function getAllPermissions(): \Illuminate\Support\Collection
+    {
+        if ($this->cachedPermissions === null) {
+            $role = $this->getRelationValue('role');
+            if ($role instanceof Role) {
+                $this->cachedPermissions = $role->permissions()->pluck('name');
+            } else {
+                $this->cachedPermissions = collect();
+            }
+        }
+        return $this->cachedPermissions;
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+        return $this->getAllPermissions()->contains($permission);
     }
 
     /**
