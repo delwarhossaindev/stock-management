@@ -6,7 +6,7 @@
 
 <p align="center">
   A comprehensive inventory and stock management web application built with Laravel.<br/>
-  Manage products, track purchases and sales, generate reports, and maintain complete control over your business inventory.
+  Manage products, warehouses, brands, purchases, sales, POS, quotations, returns, payments, expenses, and reports — with fine-grained roles & permissions, database backup, and activity logging.
 </p>
 
 <p align="center">
@@ -29,13 +29,20 @@
 - [📖 User Manual](#-user-manual)
   - [🔐 Authentication](#-authentication)
   - [👤 Default Accounts](#-default-accounts)
-  - [🛡️ Role-Based Permissions](#️-role-based-permissions)
+  - [🛡️ Roles & Permissions](#️-roles--permissions)
   - [📊 Dashboard](#-dashboard)
   - [📁 Master Data Management](#-master-data-management)
   - [🛒 Purchase Management](#-purchase-management)
   - [💰 Sales Management](#-sales-management)
+  - [🖥️ POS](#-pos-point-of-sale)
+  - [📄 Quotations](#-quotations)
+  - [↩️ Returns & Payments](#-returns--payments)
+  - [💳 Expenses](#-expenses)
+  - [📉 Stock Adjustments](#-stock-adjustments)
   - [📈 Reports](#-reports)
   - [👥 User Management](#-user-management)
+  - [🛡️ Roles & Permissions](#️-roles--permissions)
+  - [⚙️ Settings, Backup & Activity Log](#️-settings-backup--activity-log)
   - [⚙️ Profile Settings](#️-profile-settings)
   - [📥 Import & Export](#-import--export)
   - [🌐 Language Support](#-language-support)
@@ -47,20 +54,53 @@
 
 ## ✨ Features
 
+### 📊 Core Modules
+
 | Feature | Description |
 |---------|-------------|
 | 📊 **Dashboard** | Real-time overview of products, categories, suppliers, purchases, sales, profit, low-stock alerts, and recent activity |
-| 📦 **Product Management** | Full CRUD with SKU tracking, stock levels, image uploads, category and unit assignment |
-| 🏷️ **Category & Unit Management** | Organize products by categories and measurement units |
-| 🤝 **Supplier & Customer Management** | Maintain supplier/customer records with contact details and transaction history |
-| 🛒 **Purchase Management** | Multi-item invoice-based purchasing with automatic stock increment |
-| 💰 **Sales Management** | Multi-item invoice-based sales with automatic stock decrement |
-| 📈 **Reports** | Stock, purchase, sale, and profit reports with date range and category filtering |
-| 📥 **Excel Import/Export** | Bulk import and export data via Excel (xlsx, xls, csv) with downloadable sample templates |
-| 🛡️ **Role-Based Access Control** | Two-tier permission system (Admin/User) with backend middleware enforcement |
-| 👥 **User Management** | Admin-only user CRUD with role assignment |
-| 🌐 **Multilingual** | English and Bengali (বাংলা) language support |
-| 🎨 **Responsive UI** | Built with Bootstrap 5 for a clean, modern interface |
+| 📦 **Product Management** | Full CRUD with SKU tracking, stock levels, barcode generation, brand & warehouse assignment, image uploads |
+| 🏷️ **Categories** | Organize products by categories with full CRUD |
+| ⭐ **Brands** | Manage product brands |
+| 📏 **Units** | Measurement units (pcs, kg, liter, box, etc.) |
+| 🏢 **Warehouses** | Multi-warehouse support for inventory management |
+| 🤝 **Suppliers** | Supplier records with contact details and purchase history |
+| 🤝 **Customers** | Customer records with contact details and sale history |
+
+### 🛒 Transactions
+
+| Feature | Description |
+|---------|-------------|
+| 🖥️ **POS (Point of Sale)** | Quick sales interface for retail operations |
+| 🛒 **Purchases** | Multi-item invoice-based purchasing with auto stock increment, PDF download |
+| 💰 **Sales** | Multi-item invoice-based sales with auto stock decrement, PDF download |
+| 📄 **Quotations** | Create and manage quotations with PDF export & email |
+| ↩️ **Purchase Returns** | Process purchase returns with stock adjustment |
+| ↩️ **Sale Returns** | Process sale returns with stock adjustment |
+| 💵 **Payments** | Track payments for purchases and sales |
+
+### 📈 Finance & Reports
+
+| Feature | Description |
+|---------|-------------|
+| 💳 **Expenses** | Expense tracking with categories |
+| 📁 **Expense Categories** | Categorize business expenses |
+| 📊 **Reports** | Stock, purchase, sale, and profit/loss reports with filters |
+| 📉 **Stock Adjustments** | Manual stock corrections (damage, theft, counting) |
+
+### 🔧 Admin & System
+
+| Feature | Description |
+|---------|-------------|
+| 🛡️ **Roles & Permissions** | Fine-grained permission system (not just Admin/User) — assign view/create/edit/delete per module |
+| 👥 **User Management** | User CRUD with role & permission assignment |
+| 🔔 **Notifications** | In-app notification center |
+| ⚙️ **Settings** | Application settings and configuration |
+| 💾 **Database Backup** | Create and download database backups |
+| 📋 **Activity Log** | Audit trail of user actions |
+| 📥 **Excel Import/Export** | Bulk import/export for categories, units, products, suppliers, customers, purchases, sales |
+| 🌐 **Multilingual** | English and Bengali (বাংলা) |
+| 🎨 **Responsive UI** | Bootstrap 5, DataTables, modern interface |
 
 ---
 
@@ -71,11 +111,12 @@
 | 🏗️ Framework | Laravel 10 | ![Laravel](https://img.shields.io/badge/Laravel-10-FF2D20?style=flat-square&logo=laravel&logoColor=white) |
 | 💻 Language | PHP 8.1+ | ![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=flat-square&logo=php&logoColor=white) |
 | 🗄️ Database | MySQL 5.7+ | ![MySQL](https://img.shields.io/badge/MySQL-5.7+-4479A1?style=flat-square&logo=mysql&logoColor=white) |
-| 🎨 Frontend | Bootstrap 5, Alpine.js 3 | ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat-square&logo=bootstrap&logoColor=white) |
+| 🎨 Frontend | Bootstrap 5, Alpine.js | ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat-square&logo=bootstrap&logoColor=white) |
 | ⚡ Build Tool | Vite 5 | ![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white) |
 | 🔐 Auth | Laravel Breeze + Sanctum | ![Sanctum](https://img.shields.io/badge/Sanctum-Auth-FF2D20?style=flat-square&logo=laravel&logoColor=white) |
 | 📊 Excel | Maatwebsite Excel 3.1 | ![Excel](https://img.shields.io/badge/Maatwebsite-Excel-217346?style=flat-square&logo=microsoftexcel&logoColor=white) |
 | 📋 DataTables | Yajra DataTables 10 | ![DataTables](https://img.shields.io/badge/Yajra-DataTables-336791?style=flat-square) |
+| 📄 PDF | Laravel DomPDF | ![DomPDF](https://img.shields.io/badge/DomPDF-PDF-00A4EF?style=flat-square) |
 
 ---
 
@@ -130,8 +171,12 @@ DB_PASSWORD=
 ### Step 5 — Run Migrations & Seed Data
 
 ```bash
-php artisan migrate --seed
+php artisan migrate
+php artisan db:seed --class=RolePermissionSeeder
+php artisan db:seed
 ```
+
+> **Note:** Run `RolePermissionSeeder` first to create admin/user roles and permissions. Then run `DatabaseSeeder` for sample products, categories, purchases, sales, etc.
 
 ### Step 6 — Storage Link
 
@@ -212,96 +257,41 @@ After running `php artisan migrate --seed`, the following accounts are available
 
 ---
 
-### 🛡️ Role-Based Permissions
+### 🛡️ Roles & Permissions
 
-The application enforces role-based access control at both the **route level** (middleware) and **UI level** (hidden buttons). Unauthorized access returns a `403 Forbidden` error.
+The application uses a **fine-grained permission system**. Each module has separate permissions: `view`, `create`, `edit`, `delete`. Roles (Admin, User, or custom) are assigned permissions. Unauthorized access returns `403 Forbidden`.
 
-#### 📋 Permission Matrix
+#### 📋 Permission Groups
 
-| Feature | 🔴 Admin | 🔵 User |
-|---------|:--------:|:-------:|
-| **📊 Dashboard** | | |
-| View dashboard | ✅ | ✅ |
-| **🏷️ Categories** | | |
-| View / List categories | ✅ | ✅ |
-| Create / Edit / Delete | ✅ | ❌ |
-| Import categories | ✅ | ❌ |
-| Export categories | ✅ | ✅ |
-| **📏 Units** | | |
-| View / List units | ✅ | ✅ |
-| Create / Edit / Delete | ✅ | ❌ |
-| Import units | ✅ | ❌ |
-| Export units | ✅ | ✅ |
-| **📦 Products** | | |
-| View / List products | ✅ | ✅ |
-| View product details | ✅ | ✅ |
-| Create / Edit / Delete | ✅ | ❌ |
-| Import products | ✅ | ❌ |
-| Export products | ✅ | ✅ |
-| **🏭 Suppliers** | | |
-| View / List suppliers | ✅ | ✅ |
-| View supplier details | ✅ | ✅ |
-| Create / Edit / Delete | ✅ | ❌ |
-| Quick-add (from purchase form) | ✅ | ✅ |
-| Import suppliers | ✅ | ❌ |
-| Export suppliers | ✅ | ✅ |
-| **🧑‍💼 Customers** | | |
-| View / List customers | ✅ | ✅ |
-| Create / Edit / Delete | ✅ | ❌ |
-| Quick-add (from sale form) | ✅ | ✅ |
-| Import customers | ✅ | ❌ |
-| Export customers | ✅ | ✅ |
-| **🛒 Purchases** | | |
-| View / List purchases | ✅ | ✅ |
-| View purchase details | ✅ | ✅ |
-| Create new purchase | ✅ | ✅ |
-| Edit / Delete purchase | ✅ | ❌ |
-| Import purchases | ✅ | ❌ |
-| Export purchases | ✅ | ✅ |
-| **💰 Sales** | | |
-| View / List sales | ✅ | ✅ |
-| View sale details | ✅ | ✅ |
-| Create new sale | ✅ | ✅ |
-| Edit / Delete sale | ✅ | ❌ |
-| Import sales | ✅ | ❌ |
-| Export sales | ✅ | ✅ |
-| **📈 Reports** | | |
-| Stock report | ✅ | ✅ |
-| Purchase report | ✅ | ✅ |
-| Sale report | ✅ | ✅ |
-| Profit report | ✅ | ✅ |
-| **👥 User Management** | | |
-| View / List users | ✅ | ❌ |
-| Create / Edit / Delete users | ✅ | ❌ |
-| Assign roles | ✅ | ❌ |
-| **⚙️ Profile** | | |
-| Edit own profile | ✅ | ✅ |
-| Change own password | ✅ | ✅ |
-| Delete own account | ✅ | ✅ |
-| **🌐 Language** | | |
-| Switch language | ✅ | ✅ |
+| Module | Permissions |
+|--------|-------------|
+| **Dashboard** | `dashboard.view` |
+| **Categories, Brands, Units** | view, create, edit, delete |
+| **Products, Warehouses** | view, create, edit, delete |
+| **Suppliers, Customers** | view, create, edit, delete |
+| **Purchases, Sales, Quotations** | view, create, edit, delete |
+| **POS** | `pos.access` |
+| **Purchase Returns, Sale Returns** | view, create |
+| **Payments** | view, create |
+| **Expenses, Expense Categories** | view, create, edit, delete |
+| **Stock Adjustments** | view, create |
+| **Notifications, Reports** | view |
+| **Users, Roles** | view, create, edit, delete |
+| **Settings, Backups** | manage |
+| **Activity Log** | view |
 
-#### 🔧 How It Works
+#### 🔧 Default Roles
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    REQUEST FLOW                         │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  User Request ──▶ Auth Middleware ──▶ Role Middleware    │
-│                        │                    │           │
-│                   Logged in?          Is Admin?          │
-│                   ┌────┴────┐        ┌────┴────┐       │
-│                   │ No: 401 │        │ No: 403 │       │
-│                   │ Yes: ✅  │        │ Yes: ✅  │       │
-│                   └─────────┘        └─────────┘       │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
+| Role | Access |
+|------|--------|
+| **Admin** | All permissions |
+| **User** | Dashboard, view master data, create purchases/sales/quotations/POS, returns, payments, expenses (view), stock adjustments, notifications, reports |
 
-- 🔒 **Backend Enforcement**: A `role:admin` middleware protects all admin-only routes. Non-admin users receive a `403 Forbidden` response.
-- 👁️ **UI Enforcement**: Admin-only buttons (Add, Edit, Delete, Import) are hidden from the interface for regular users.
-- 📌 **Sidebar Navigation**: The "Users" menu item is only visible to admin users.
+#### 🔒 How It Works
+
+- Routes use `permission:module.action` middleware
+- Sidebar menu items check `auth()->user()->hasPermission('xxx.view')`
+- Admin role bypasses all permission checks
 
 ---
 
@@ -338,6 +328,13 @@ Categories help organize your products (e.g., Electronics, Clothing, Food).
 
 > ⚠️ Deleting a category that has associated products may affect those products.
 
+#### ⭐ Brands
+
+Brands help organize products by manufacturer or brand name.
+
+- 👁️ **View All**: Navigate to **Brands** from the sidebar.
+- ➕ **Add New** (permission required): Click **Add Brand** → enter **Name** → click **Save**.
+
 #### 📏 Units
 
 Units define how products are measured (e.g., pcs, kg, liter, box).
@@ -348,13 +345,14 @@ Units define how products are measured (e.g., pcs, kg, liter, box).
 
 #### 📦 Products
 
-Products are the core of your inventory.
+Products are the core of your inventory. Products can be assigned to **Categories**, **Brands**, **Units**, and **Warehouses**.
 
-- 👁️ **View All**: Navigate to **Products** from the sidebar. The DataTable shows product name, SKU, category, stock level, buy/sell price, and status badges:
+- 👁️ **View All**: Navigate to **Products** from the sidebar. The DataTable shows product name, SKU, category, brand, stock level, buy/sell price, and status badges:
   - 🟢 **Green badge** — In Stock
   - 🟡 **Yellow badge** — Low Stock (quantity <= 5)
   - 🔴 **Red badge** — Out of Stock (quantity = 0)
 - 🔍 **View Details**: Click the view button to see full details including purchase and sale history.
+- 📊 **Barcode**: Generate and print product barcodes from the product list.
 - ➕ **Add New Product** `🔴 Admin`:
   1. Click **Add Product**
   2. Fill in: **Name**, **SKU** (unique identifier), **Category**, **Unit**, **Buy Price**, **Sell Price**, **Quantity**, **Description** (optional), **Image** (optional, max 2MB)
@@ -372,6 +370,13 @@ Suppliers are your product vendors.
 - ➕ **Add New** `🔴 Admin`: Click **Add Supplier** → enter **Name**, **Email**, **Phone**, **Address** → click **Save**.
 - ⚡ **Quick Add**: When creating a purchase, you can add a new supplier on the fly without leaving the purchase form (available to all users).
 - ✏️🗑️ **Edit/Delete** `🔴 Admin`: Use action buttons on each row.
+
+#### 🏢 Warehouses
+
+Manage multiple storage locations. Products can be assigned to warehouses for multi-location inventory.
+
+- 👁️ **View All**: Navigate to **Warehouses** from the sidebar.
+- ➕ **Add New** (permission required): Enter warehouse name and address.
 
 #### 🧑‍💼 Customers
 
@@ -460,6 +465,38 @@ Deleting a sale reverses the stock decrement — product quantities are increase
 
 ---
 
+### 🖥️ POS (Point of Sale)
+
+A streamlined interface for quick retail sales. Add products to the cart, apply discounts, and complete sales in seconds. Stock is automatically decremented on checkout.
+
+---
+
+### 📄 Quotations
+
+Create and manage price quotations for customers. Generate PDF quotations and send them via email directly from the system.
+
+---
+
+### ↩️ Returns & Payments
+
+- **Purchase Returns**: Process returns to suppliers — stock is decreased when a purchase return is created.
+- **Sale Returns**: Process returns from customers — stock is increased when a sale return is created.
+- **Payments**: Track payments for purchases and sales (collect dues, record payments).
+
+---
+
+### 💳 Expenses
+
+Track business expenses by category. Create expense categories (e.g., Rent, Utilities, Salaries) and record expenses with date, amount, and description.
+
+---
+
+### 📉 Stock Adjustments
+
+Manually adjust stock levels for corrections (e.g., damage, theft, inventory count discrepancies). Record the reason and quantity change.
+
+---
+
 ### 📈 Reports
 
 Navigate to **Reports** from the sidebar to access the reporting module.
@@ -502,19 +539,26 @@ View overall business profitability.
 
 ### 👥 User Management
 
-> 🔒 **Admin only** — This entire module is restricted to administrators. Regular users cannot access it and the menu item is hidden from their sidebar.
+> 🔒 Requires `users.view` permission — Menu item is visible only to users with the appropriate permission.
 
-- 👁️ **View All Users**: Navigate to **Users** from the sidebar (admin only).
-- ➕ **Add New User**: Click **Add User** → enter **Name**, **Email**, **Password**, and assign a **Role** (Admin or User) → click **Save**.
+- 👁️ **View All Users**: Navigate to **Users** from the sidebar.
+- ➕ **Add New User**: Click **Add User** → enter **Name**, **Email**, **Password**, and assign a **Role** → click **Save**.
 - ✏️ **Edit User**: Click **Edit** → update details and role → click **Update**.
-- 🗑️ **Delete User**: Click **Delete** → confirm. You cannot delete your own account from this page.
+- 🗑️ **Delete User**: Click **Delete** → confirm. You cannot delete your own account.
 
-#### 🏷️ Roles Summary
+### 🛡️ Roles & Permissions
 
-| Role | Badge | Description |
-|------|-------|-------------|
-| **Admin** | 🔴 | Full access to all features: CRUD on all modules, user management, import/export |
-| **User** | 🔵 | View-only access to master data, can create purchases & sales, view reports, export data |
+- 👁️ **View Roles**: Navigate to **Roles & Permissions** from the Admin section.
+- ➕ **Create Role**: Add custom roles and assign granular permissions (view/create/edit/delete per module).
+- ✏️ **Edit Role**: Modify role name and permission assignments.
+
+### ⚙️ Settings, Backup & Activity Log
+
+| Module | Description |
+|--------|-------------|
+| **Settings** | Configure application settings (company name, logo, etc.) |
+| **Database Backup** | Create SQL backups and download them |
+| **Activity Log** | View audit trail of user actions across the system |
 
 ---
 
@@ -578,14 +622,17 @@ To switch languages:
 ### 🔗 Entity Relationship Overview
 
 ```
-┌────────────┐
-│ categories │──┐
-└────────────┘  │    ┌──────────┐     ┌────────────────┐     ┌───────────┐     ┌───────────┐
-                ├──▶ │ products │──▶──│ purchase_items  │──▶──│ purchases │──▶──│ suppliers │
-┌────────────┐  │    └──────────┘     └────────────────┘     └───────────┘     └───────────┘
-│   units    │──┘         │
-└────────────┘            │           ┌────────────────┐     ┌───────────┐     ┌───────────┐
-                          └────▶──────│  sale_items     │──▶──│   sales   │──▶──│ customers │
+┌────────────┐  ┌─────────┐  ┌────────────┐
+│ categories │  │  brands  │  │ warehouses  │
+└─────┬──────┘  └────┬─────┘  └──────┬──────┘
+      │              │              │
+      └──────────────┼──────────────┘
+                     ▼
+              ┌──────────┐     ┌────────────────┐     ┌───────────┐     ┌───────────┐
+              │ products │◀───▶│ purchase_items │────▶│ purchases │────▶│ suppliers │
+┌────────────┐ └──────────┘     └────────────────┘     └───────────┘     └───────────┘
+│   units    │        │                ┌────────────────┐     ┌───────────┐     ┌───────────┐
+└─────┬──────┘        └──────────────▶│  sale_items    │────▶│   sales   │────▶│ customers │
                                       └────────────────┘     └───────────┘     └───────────┘
 ```
 
@@ -593,16 +640,25 @@ To switch languages:
 
 | Table | Description |
 |-------|-------------|
-| 👤 `users` | User accounts with roles and language preferences |
+| 👤 `users` | User accounts with role_id, language preferences |
+| 🔐 `roles`, `permissions`, `role_permission` | Role-based permission system |
 | 🏷️ `categories` | Product categories |
+| ⭐ `brands` | Product brands |
 | 📏 `units` | Measurement units |
-| 📦 `products` | Product catalog with stock tracking |
+| 🏢 `warehouses` | Warehouse/location storage |
+| 📦 `products` | Product catalog with stock, brand_id, warehouse_id |
 | 🏭 `suppliers` | Supplier contact information |
 | 🧑‍💼 `customers` | Customer contact information |
-| 🛒 `purchases` | Purchase invoice headers |
-| 📋 `purchase_items` | Purchase invoice line items |
-| 💰 `sales` | Sale invoice headers |
-| 📋 `sale_items` | Sale invoice line items |
+| 🛒 `purchases`, `purchase_items` | Purchase invoices |
+| 💰 `sales`, `sale_items` | Sale invoices |
+| 📄 `quotations`, `quotation_items` | Quotations |
+| ↩️ `purchase_returns`, `sale_returns` | Returns |
+| 💵 `payments` | Payment records |
+| 💳 `expenses`, `expense_categories` | Expense tracking |
+| 📉 `stock_adjustments` | Stock corrections |
+| ⚙️ `settings` | Application settings |
+| 📋 `activity_logs` | Audit trail |
+| 🔔 `notifications` | User notifications |
 
 ### 🔑 Key Fields
 
@@ -681,9 +737,17 @@ All routes require authentication. Routes marked with 🔴 require the `role:adm
 | `GET` | `/reports/purchase` | Purchase report | 🟢 All |
 | `GET` | `/reports/sale` | Sale report | 🟢 All |
 | `GET` | `/reports/profit` | Profit report | 🟢 All |
-| `GET` | `/{module}-export` | Export data to Excel | 🟢 All |
-| `POST` | `/{module}-import` | Import data from Excel | 🔴 Admin |
-| `GET` | `/{module}-sample` | Download sample template | 🔴 Admin |
+| `GET` | `/pos` | POS interface | permission |
+| `GET` | `/quotations`, `/quotations/{id}/pdf` | Quotations & PDF | permission |
+| `GET` | `/purchase-returns`, `/sale-returns` | Returns | permission |
+| `GET` | `/payments`, `/expenses` | Payments & expenses | permission |
+| `GET` | `/stock-adjustments` | Stock adjustments | permission |
+| `GET` | `/roles` | Roles & permissions | permission |
+| `GET` | `/settings`, `/backups` | Settings & backups | permission |
+| `GET` | `/activity-logs` | Activity log | permission |
+| `GET` | `/{module}-export` | Export data to Excel | permission |
+| `POST` | `/{module}-import` | Import data from Excel | permission |
+| `GET` | `/{module}-sample` | Download sample template | permission |
 | `GET` | `/language/{lang}` | Switch language (en/bn) | 🟢 All |
 
 ---
